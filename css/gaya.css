@@ -1,0 +1,253 @@
+/* Reset dan Variabel */
+:root {
+    --warna-primer: #6b9080;
+    --warna-sekunder: #a4c3b2;
+    --warna-latar: #f6fff8;
+    --warna-teks: #2f3e46;
+    --warna-aksen: #cce3de;
+    --bayangan: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--warna-latar);
+    color: var(--warna-teks);
+}
+
+/* Layout Utama */
+.kontainer {
+    display: flex;
+    min-height: 100vh;
+}
+
+.menu-kiri {
+    width: 440px;
+    height: 100%;
+    min-width: 340px;
+    background-color: white;
+    padding: 32px 24px;
+    box-shadow: var(--bayangan);
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, auto);
+    gap: 24px 20px;
+}
+
+.menu-kiri h1 {
+    grid-column: 1 / -1;
+}
+
+.area-kanvas {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+/* Canvas */
+#kanvas {
+    background-color: white;
+    box-shadow: var(--bayangan);
+    border-radius: 4px;
+    cursor: crosshair;
+}
+
+/* Panel dan Heading */
+.panel {
+    background-color: var(--warna-latar);
+    border-radius: 10px;
+    padding: 20px 14px;
+    margin-bottom: 0;
+    min-width: 0;
+}
+
+h1 {
+    color: var(--warna-primer);
+    margin-bottom: 30px;
+    font-size: 24px;
+    text-align: center;
+}
+
+h2 {
+    color: var(--warna-primer);
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+h3 {
+    color: var(--warna-teks);
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.panel h2 {
+    font-size: 15px;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+.panel h3 {
+    font-size: 13px;
+    margin-bottom: 7px;
+    letter-spacing: 0.2px;
+}
+.panel label, .panel span, .panel select, .panel input[type="number"] {
+    font-size: 12px;
+}
+
+/* Tombol */
+button {
+    background-color: var(--warna-primer);
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 6px;
+    font-size: 13px;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: var(--warna-sekunder);
+}
+
+/* Input dan Select */
+.input-group {
+    margin-bottom: 12px;
+}
+
+label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--warna-teks);
+}
+
+input[type="number"],
+input[type="text"],
+select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--warna-sekunder);
+    border-radius: 4px;
+    background-color: white;
+}
+
+.judul-diatas-kanvas {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.input-warna-horiz {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.input-warna-horiz .input-group {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.input-warna-horiz span {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 2px;
+}
+
+input[type="color"] {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    padding: 0;
+    border: 1.5px solid var(--warna-sekunder);
+    box-sizing: border-box;
+}
+
+/* Transformasi Group */
+.transformasi-group {
+    background-color: white;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+/* Responsif */
+@media (max-width: 900px) {
+    .kontainer {
+        flex-direction: column;
+    }
+    .menu-kiri {
+        width: 100%;
+        min-width: 0;
+        max-height: 400px;
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+        gap: 16px;
+    }
+}
+
+.input-panah {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+}
+.input-panah button {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    background-color: var(--warna-aksen);
+    color: var(--warna-teks);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.input-panah button:hover {
+    background-color: var(--warna-sekunder);
+}
+
+.input-panah-dpad {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 4px;
+    gap: 16px;
+}
+.input-panah-dpad button {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+    background-color: #6b7a86;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.input-panah-dpad button:hover {
+    background-color: #a4c3b2;
+    color: #2f3e46;
+}
+.dpad-center {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+} 

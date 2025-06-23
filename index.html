@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paint Dea - Grafika Komputer</title>
+    <link rel="stylesheet" href="css/gaya.css">
+</head>
+<body>
+    <div class="kontainer">
+        
+        <aside class="menu-kiri">
+            <h1>Tugas Akhir Dea Reigina</h1>
+            <!-- Panel Bentuk -->
+            <div class="panel">
+                <h2>Bentuk Dasar</h2>
+                <select id="dropdownBentuk">
+                    <option value="garis">Garis</option>
+                    <option value="persegi">Persegi</option>
+                    <option value="segitiga">Segitiga</option>
+                    <option value="lingkaran">Lingkaran</option>
+                    <option value="elips">Elips</option>
+                    <option value="jajargenjang">Jajargenjang</option>
+                    <option value="trapesium">Trapesium</option>
+                </select>
+            </div>
+
+            <!-- Panel Algoritma -->
+            <div class="panel">
+                <h2>Algoritma</h2>
+                <select id="pilihAlgoritma">
+                    <option value="dda">DDA</option>
+                    <option value="bresenham">Bresenham</option>
+                </select>
+            </div>
+
+            <!-- Panel Garis -->
+            <div class="panel">
+                <h2>Jenis Garis</h2>
+                <select id="jenisGaris">
+                    <option value="solid">Garis Biasa</option>
+                    <option value="dashed">Garis Putus-putus</option>
+                    <option value="dotted">Garis Titik-titik</option>
+                    <option value="dashdot">Garis Kombinasi</option>
+                </select>
+            </div>
+
+            <!-- Panel Warna -->
+            <div class="panel">
+                <h2>Warna</h2>
+                <div class="input-warna-horiz">
+                    <div class="input-group">
+                        <span>Garis</span>
+                        <input type="color" id="warnaGaris" value="#000000">
+                    </div>
+                    <div class="input-group">
+                        <span>Isi</span>
+                        <input type="color" id="warnaIsi" value="#ffffff">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Transformasi -->
+            <div class="panel" id="panelTransformasi">
+                <h2>Transformasi</h2>
+                <select id="dropdownTransformasi">
+                    <option value="translasi">Translasi</option>
+                    <option value="rotasi">Rotasi</option>
+                    <option value="skala">Skala</option>
+                </select>
+                <div id="formTransformasi">
+                    <!-- Form dinamis akan muncul di sini -->
+                </div>
+            </div>
+
+            <!-- Panel Aksi -->
+            <div class="panel">
+                <h2>Aksi</h2>
+                <button id="btnDuplikat">Duplikat Objek</button>
+                <button id="btnHapus">Hapus Objek</button>
+                <button id="btnReset">Reset Canvas</button>
+            </div>
+        </aside>
+
+        <main class="area-kanvas">
+            <canvas id="kanvas"></canvas>
+        </main>
+    </div>
+
+    <!-- Script -->
+    <script src="js/algoritma/dda.js"></script>
+    <script src="js/algoritma/bresenham.js"></script>
+    <script src="js/algoritma/midpoint_lingkaran.js"></script>
+    <script src="js/algoritma/midpoint_elips.js"></script>
+    <script src="js/algoritma/isi_area.js"></script>
+    <script src="js/transformasi/translasi.js"></script>
+    <script src="js/transformasi/rotasi.js"></script>
+    <script src="js/transformasi/skala.js"></script>
+    <script src="js/utama.js"></script>
+</body>
+</html> 
