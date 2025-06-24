@@ -182,7 +182,12 @@ function init() {
       selesaiMenggambar(e);
     }
   });
-  kanvas.addEventListener("click", pilihObjek);
+  kanvas.addEventListener("click", (e) => {
+    // Hanya bisa memilih objek jika TIDAK dalam mode brush
+    if (!modeBrush) {
+      pilihObjek(e);
+    }
+  });
 
   // Tambahan: Dynamic Dropdown dan Form Transformasi
   setupDropdownsAndDynamicForm();
