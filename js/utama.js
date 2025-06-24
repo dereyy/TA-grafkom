@@ -598,18 +598,32 @@ function gambarObjek(objek) {
       break;
 
     case "lingkaran":
+      // Isi lingkaran
+      if (objek.warnaIsi && objek.warnaIsi !== "#ffffff") {
+        ctx.beginPath();
+        ctx.arc(objek.x, objek.y, objek.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = objek.warnaIsi;
+        ctx.fill();
+      }
+      // Gambar garis lingkaran
       AlgoritmaMidpointLingkaran.gambarLingkaran(
         ctx,
         objek.x,
         objek.y,
         objek.radius,
         objek.warnaGaris,
-        objek.warnaIsi,
+        null, // warnaIsi jangan diisi di sini
         objek.jenisGaris
       );
       break;
 
     case "elips":
+      if (objek.warnaIsi && objek.warnaIsi !== "#ffffff") {
+        ctx.beginPath();
+        ctx.ellipse(objek.x, objek.y, objek.rx, objek.ry, 0, 0, 2 * Math.PI);
+        ctx.fillStyle = objek.warnaIsi;
+        ctx.fill();
+      }
       AlgoritmaMidpointElips.gambarElips(
         ctx,
         objek.x,
@@ -617,7 +631,7 @@ function gambarObjek(objek) {
         objek.rx,
         objek.ry,
         objek.warnaGaris,
-        objek.warnaIsi,
+        null, // warnaIsi jangan diisi di sini
         objek.jenisGaris
       );
       break;
@@ -838,12 +852,18 @@ function isiArea(e) {
   const rect = kanvas.getBoundingClientRect();
   const x = Math.floor(e.clientX - rect.left);
   const y = Math.floor(e.clientY - rect.top);
-  // Cek semua objek poligon (termasuk persegi, segitiga, poligon umum)
   let found = false;
   for (const objek of objekList) {
     if (
-      objek.jenis === "poligon" &&
-      apakahTitikDalamPoligon(x, y, objek.titik)
+      (objek.jenis === "poligon" &&
+        apakahTitikDalamPoligon(x, y, objek.titik)) ||
+      (objek.jenis === "lingkaran" &&
+        Math.pow(x - objek.x, 2) + Math.pow(y - objek.y, 2) <=
+          Math.pow(objek.radius, 2)) ||
+      (objek.jenis === "elips" &&
+        Math.pow(x - objek.x, 2) / Math.pow(objek.rx, 2) +
+          Math.pow(y - objek.y, 2) / Math.pow(objek.ry, 2) <=
+          1)
     ) {
       found = true;
       objek.warnaIsi = warnaIsi;
