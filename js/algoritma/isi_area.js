@@ -1,173 +1,32 @@
 /**
- * Implementasi algoritma Flood Fill untuk mengisi area
+ * Kelas yang berisi implementasi algoritma pengisian area.
  */
 class AlgoritmaIsiArea {
   /**
-   * Mengisi area menggunakan algoritma Flood Fill
-   * @param {CanvasRenderingContext2D} ctx - Context canvas
-   * @param {number} x - Koordinat x titik awal
-   * @param {number} y - Koordinat y titik awal
-   * @param {string} warnaIsi - Warna untuk mengisi area
-   * @param {string} warnaBatas - Warna batas area (opsional)
-   */
-  static floodFill(ctx, x, y, warnaIsi, warnaBatas = null) {
-    // Konversi ke integer
-    x = Math.round(x);
-    y = Math.round(y);
-
-    // Dapatkan data gambar
-    const imageData = ctx.getImageData(
-      0,
-      0,
-      ctx.canvas.width,
-      ctx.canvas.height
-    );
-    const pixels = imageData.data;
-
-    // Dapatkan warna target (warna yang akan diganti)
-    const targetColor = this.getPixelColor(pixels, x, y, ctx.canvas.width);
-    const fillColor = this.hexToRgb(warnaIsi);
-
-    // Jika warna target sama dengan warna isi, return
-    if (this.isSameColor(targetColor, fillColor)) {
-      return;
-    }
-
-    // Stack untuk menyimpan pixel yang akan diproses
-    const stack = [[x, y]];
-
-    while (stack.length > 0) {
-      const [currentX, currentY] = stack.pop();
-
-      // Cek apakah pixel valid
-      if (
-        !this.isValidPixel(
-          currentX,
-          currentY,
-          ctx.canvas.width,
-          ctx.canvas.height
-        )
-      ) {
-        continue;
-      }
-
-      // Dapatkan warna pixel saat ini
-      const currentColor = this.getPixelColor(
-        pixels,
-        currentX,
-        currentY,
-        ctx.canvas.width
-      );
-
-      // Jika warna tidak sama dengan target atau sama dengan batas, lanjut
-      if (!this.isSameColor(currentColor, targetColor)) {
-        continue;
-      }
-
-      // Jika ada warna batas dan pixel saat ini adalah batas, lanjut
-      if (
-        warnaBatas &&
-        this.isSameColor(currentColor, this.hexToRgb(warnaBatas))
-      ) {
-        continue;
-      }
-
-      // Isi pixel dengan warna baru
-      this.setPixelColor(
-        pixels,
-        currentX,
-        currentY,
-        fillColor,
-        ctx.canvas.width
-      );
-
-      // Tambahkan pixel tetangga ke stack
-      stack.push([currentX + 1, currentY]);
-      stack.push([currentX - 1, currentY]);
-      stack.push([currentX, currentY + 1]);
-      stack.push([currentX, currentY - 1]);
-    }
-
-    // Update canvas dengan data gambar yang baru
-    ctx.putImageData(imageData, 0, 0);
-  }
-
-  /**
-   * Mengecek apakah koordinat pixel valid
-   * @private
-   */
-  static isValidPixel(x, y, width, height) {
-    return x >= 0 && x < width && y >= 0 && y < height;
-  }
-
-  /**
-   * Mendapatkan warna pixel pada koordinat tertentu
-   * @private
-   */
-  static getPixelColor(pixels, x, y, width) {
-    const index = (y * width + x) * 4;
-    return {
-      r: pixels[index],
-      g: pixels[index + 1],
-      b: pixels[index + 2],
-      a: pixels[index + 3],
-    };
-  }
-
-  /**
-   * Mengatur warna pixel pada koordinat tertentu
-   * @private
-   */
-  static setPixelColor(pixels, x, y, color, width) {
-    const index = (y * width + x) * 4;
-    pixels[index] = color.r;
-    pixels[index + 1] = color.g;
-    pixels[index + 2] = color.b;
-    pixels[index + 3] = color.a !== undefined ? color.a : 255;
-  }
-
-  /**
-   * Mengecek apakah dua warna sama
-   * @private
-   */
-  static isSameColor(color1, color2) {
-    return (
-      color1.r === color2.r &&
-      color1.g === color2.g &&
-      color1.b === color2.b &&
-      (color1.a === color2.a || color2.a === undefined)
-    );
-  }
-
-  /**
-   * Konversi warna hex ke RGB
-   * @private
+   * Mengkonversi warna dari format hex ke RGB.
+   * @param {string} hex - Warna dalam format hex (#RRGGBB)
+   * @returns {number[]} Array berisi nilai RGB [r, g, b]
    */
   static hexToRgb(hex) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
-      ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16),
-        }
-      : null;
+      ? [
+          parseInt(result[1], 16),
+          parseInt(result[2], 16),
+          parseInt(result[3], 16),
+        ]
+      : [0, 0, 0];
   }
 
   /**
-   * Mengisi area menggunakan algoritma Boundary Fill
-   * @param {CanvasRenderingContext2D} ctx - Context canvas
+   * Mengisi area dengan algoritma boundary fill.
+   * @param {CanvasRenderingContext2D} ctx - Konteks canvas 2D
    * @param {number} x - Koordinat x titik awal
    * @param {number} y - Koordinat y titik awal
-   * @param {string} warnaIsi - Warna untuk mengisi area
-   * @param {string} warnaBatas - Warna batas area
+   * @param {string} warnaIsi - Warna yang akan digunakan untuk mengisi area
+   * @param {string} warnaBatas - Warna batas area yang akan diisi
    */
   static boundaryFill(ctx, x, y, warnaIsi, warnaBatas) {
-    // Konversi ke integer
-    x = Math.round(x);
-    y = Math.round(y);
-
-    // Dapatkan data gambar
     const imageData = ctx.getImageData(
       0,
       0,
@@ -175,62 +34,166 @@ class AlgoritmaIsiArea {
       ctx.canvas.height
     );
     const pixels = imageData.data;
+    const canvasWidth = ctx.canvas.width;
 
-    // Konversi warna
-    const fillColor = this.hexToRgb(warnaIsi);
-    const boundaryColor = this.hexToRgb(warnaBatas);
+    const warnaIsiRgb = this.hexToRgb(warnaIsi);
+    const warnaBatasRgb = this.hexToRgb(warnaBatas);
 
-    // Stack untuk menyimpan pixel yang akan diproses
-    const stack = [[x, y]];
-
-    while (stack.length > 0) {
-      const [currentX, currentY] = stack.pop();
-
-      // Cek apakah pixel valid
-      if (
-        !this.isValidPixel(
-          currentX,
-          currentY,
-          ctx.canvas.width,
-          ctx.canvas.height
-        )
-      ) {
-        continue;
-      }
-
-      // Dapatkan warna pixel saat ini
-      const currentColor = this.getPixelColor(
-        pixels,
-        currentX,
-        currentY,
-        ctx.canvas.width
-      );
-
-      // Jika pixel adalah batas atau sudah diisi, lanjut
-      if (
-        this.isSameColor(currentColor, boundaryColor) ||
-        this.isSameColor(currentColor, fillColor)
-      ) {
-        continue;
-      }
-
-      // Isi pixel dengan warna baru
-      this.setPixelColor(
-        pixels,
-        currentX,
-        currentY,
-        fillColor,
-        ctx.canvas.width
-      );
-
-      // Tambahkan pixel tetangga ke stack
-      stack.push([currentX + 1, currentY]);
-      stack.push([currentX - 1, currentY]);
-      stack.push([currentX, currentY + 1]);
-      stack.push([currentX, currentY - 1]);
+    // Jangan proses jika warna isi sama dengan warna batas
+    if (warnaIsiRgb.every((val, i) => val === warnaBatasRgb[i])) {
+      return;
     }
 
-    // Update canvas dengan data gambar yang baru
+    const stack = [[x, y]];
+
+    const getPixel = (px, py) => {
+      const index = (py * canvasWidth + px) * 4;
+      return [
+        pixels[index],
+        pixels[index + 1],
+        pixels[index + 2],
+        pixels[index + 3],
+      ];
+    };
+
+    const setPixel = (px, py) => {
+      const index = (py * canvasWidth + px) * 4;
+      pixels[index] = warnaIsiRgb[0];
+      pixels[index + 1] = warnaIsiRgb[1];
+      pixels[index + 2] = warnaIsiRgb[2];
+      pixels[index + 3] = 255;
+    };
+
+    const isSameColor = (c1, c2, tolerance = 15) => {
+      return (
+        Math.abs(c1[0] - c2[0]) <= tolerance &&
+        Math.abs(c1[1] - c2[1]) <= tolerance &&
+        Math.abs(c1[2] - c2[2]) <= tolerance
+      );
+    };
+
+    while (stack.length > 0) {
+      const [px, py] = stack.pop();
+
+      if (px < 0 || px >= canvasWidth || py < 0 || py >= ctx.canvas.height) {
+        continue;
+      }
+
+      const currentColor = getPixel(px, py);
+
+      // Anggap batas jika alpha > 0 dan warnanya cocok
+      const isBoundary =
+        currentColor[3] > 0 && isSameColor(currentColor, warnaBatasRgb);
+      // Anggap sudah diisi jika alpha = 255 dan warnanya cocok
+      const isFilled =
+        currentColor[3] === 255 && isSameColor(currentColor, warnaIsiRgb);
+
+      if (!isBoundary && !isFilled) {
+        setPixel(px, py);
+        stack.push([px + 1, py]);
+        stack.push([px - 1, py]);
+        stack.push([px, py + 1]);
+        stack.push([px, py - 1]);
+      }
+    }
+
     ctx.putImageData(imageData, 0, 0);
+  }
+
+  /**
+   * Mengisi area dengan algoritma flood fill.
+   * @param {CanvasRenderingContext2D} ctx - Konteks canvas 2D
+   * @param {number} x - Koordinat x titik awal
+   * @param {number} y - Koordinat y titik awal
+   * @param {string} warnaIsi - Warna yang akan digunakan untuk mengisi area
+   */
+  static floodFill(ctx, x, y, warnaIsi) {
+    const imageData = ctx.getImageData(
+      0,
+      0,
+      ctx.canvas.width,
+      ctx.canvas.height
+    );
+    const pixels = imageData.data;
+    const canvasWidth = ctx.canvas.width;
+
+    const warnaIsiRgb = this.hexToRgb(warnaIsi);
+
+    const getPixel = (px, py) => {
+      const index = (py * canvasWidth + px) * 4;
+      return [
+        pixels[index],
+        pixels[index + 1],
+        pixels[index + 2],
+        pixels[index + 3],
+      ];
+    };
+
+    const warnaAwal = getPixel(x, y);
+
+    // Jangan proses jika warna awal sama dengan warna isi
+    if (
+      warnaAwal[0] === warnaIsiRgb[0] &&
+      warnaAwal[1] === warnaIsiRgb[1] &&
+      warnaAwal[2] === warnaIsiRgb[2] &&
+      warnaAwal[3] === 255
+    ) {
+      return;
+    }
+
+    // Jangan proses jika titik awal adalah garis (opaque, tapi bukan warna isi)
+    if (warnaAwal[3] === 255 && !this.isSameColor(warnaAwal, warnaIsiRgb)) {
+      // Ini mungkin garis batas, jangan lakukan apa-apa
+      return;
+    }
+
+    const stack = [[x, y]];
+
+    const setPixel = (px, py) => {
+      const index = (py * canvasWidth + px) * 4;
+      pixels[index] = warnaIsiRgb[0];
+      pixels[index + 1] = warnaIsiRgb[1];
+      pixels[index + 2] = warnaIsiRgb[2];
+      pixels[index + 3] = 255;
+    };
+
+    const isSameColor = (c1, c2, tolerance = 10) => {
+      return (
+        Math.abs(c1[0] - c2[0]) <= tolerance &&
+        Math.abs(c1[1] - c2[1]) <= tolerance &&
+        Math.abs(c1[2] - c2[2]) <= tolerance &&
+        Math.abs((c1[3] || 255) - (c2[3] || 255)) <= tolerance
+      );
+    };
+
+    while (stack.length > 0) {
+      const [px, py] = stack.pop();
+
+      if (px < 0 || px >= canvasWidth || py < 0 || py >= ctx.canvas.height) {
+        continue;
+      }
+
+      const currentColor = getPixel(px, py);
+
+      if (isSameColor(currentColor, warnaAwal)) {
+        setPixel(px, py);
+        stack.push([px + 1, py]);
+        stack.push([px - 1, py]);
+        stack.push([px, py + 1]);
+        stack.push([px, py - 1]);
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+  }
+
+  // Helper untuk floodFill
+  static isSameColor(c1, c2, tolerance = 10) {
+    return (
+      Math.abs(c1[0] - c2[0]) <= tolerance &&
+      Math.abs(c1[1] - c2[1]) <= tolerance &&
+      Math.abs(c1[2] - c2[2]) <= tolerance &&
+      Math.abs((c1[3] || 255) - (c2[3] || 255)) <= tolerance
+    );
   }
 }

@@ -14,6 +14,8 @@ let algoritmaGaris = "dda";
 let jenisGaris = "solid";
 let warnaGaris = "#000000";
 let warnaIsi = "#ffffff";
+let mode = "gambar"; // Mode: 'gambar', 'isi', atau 'pilih'
+let isiAreaAktif = false;
 
 // Fungsi inisialisasi
 function init() {
@@ -93,8 +95,34 @@ function init() {
     ctx.clearRect(0, 0, kanvas.width, kanvas.height);
   });
 
+  // Tambahkan event listener untuk mode isi area
+  const btnModeIsi = document.getElementById("btnModeIsi");
+  const btnNonaktifIsi = document.getElementById("btnNonaktifIsi");
+  if (btnModeIsi && btnNonaktifIsi) {
+    btnModeIsi.addEventListener("click", () => {
+      isiAreaAktif = true;
+      mode = "isi";
+      kanvas.style.cursor = "cell";
+      btnModeIsi.style.display = "none";
+      btnNonaktifIsi.style.display = "";
+    });
+    btnNonaktifIsi.addEventListener("click", () => {
+      isiAreaAktif = false;
+      mode = "gambar";
+      kanvas.style.cursor = "crosshair";
+      btnModeIsi.style.display = "";
+      btnNonaktifIsi.style.display = "none";
+    });
+  }
+
   // Event listener untuk kanvas
-  kanvas.addEventListener("mousedown", mulaiMenggambar);
+  kanvas.addEventListener("mousedown", (e) => {
+    if (mode === "gambar") {
+      mulaiMenggambar(e);
+    } else if (mode === "isi") {
+      isiArea(e);
+    }
+  });
   kanvas.addEventListener("mousemove", sedangMenggambarObjek);
   kanvas.addEventListener("mouseup", selesaiMenggambar);
   kanvas.addEventListener("click", pilihObjek);
@@ -640,17 +668,43 @@ function gambarObjek(objek) {
 function setupDropdownsAndDynamicForm() {
   // Dropdown bentuk
   const dropdownBentuk = document.getElementById("dropdownBentuk");
+  const dropdownAlgoritma = document.getElementById("pilihAlgoritma");
+  function updateAlgoritmaDropdown() {
+    if (!dropdownAlgoritma) return;
+    if (jenisObjek === "garis") {
+      dropdownAlgoritma.style.display = "";
+      dropdownAlgoritma.innerHTML = `
+        <option value="dda">DDA</option>
+        <option value="bresenham">Bresenham</option>
+      `;
+    } else if (jenisObjek === "elips") {
+      dropdownAlgoritma.style.display = "";
+      dropdownAlgoritma.innerHTML = `
+        <option value="midpoint">Midpoint</option>
+        <option value="simetris4">Simetris 4 Titik</option>
+      `;
+    } else if (jenisObjek === "lingkaran") {
+      dropdownAlgoritma.style.display = "";
+      dropdownAlgoritma.innerHTML = `
+        <option value="midpoint">Midpoint</option>
+        <option value="simetris4">Simetris 4 Titik</option>
+        <option value="simetris8">Simetris 8 Titik</option>
+      `;
+    } else {
+      dropdownAlgoritma.style.display = "none";
+    }
+  }
   if (dropdownBentuk) {
     jenisObjek = dropdownBentuk.value;
+    updateAlgoritmaDropdown();
     dropdownBentuk.addEventListener("change", (e) => {
       jenisObjek = e.target.value;
+      updateAlgoritmaDropdown();
     });
   }
-
   // Dropdown transformasi
   const dropdownTransformasi = document.getElementById("dropdownTransformasi");
   const formTransformasi = document.getElementById("formTransformasi");
-
   function tampilkanFormTransformasi() {
     const jenis = dropdownTransformasi.value;
     let html = "";
@@ -703,7 +757,6 @@ function setupDropdownsAndDynamicForm() {
     formTransformasi.innerHTML = html;
     pasangEventFormTransformasi();
   }
-
   dropdownTransformasi.addEventListener("change", tampilkanFormTransformasi);
   tampilkanFormTransformasi();
 }
@@ -779,6 +832,29 @@ window.addEventListener("keydown", (e) => {
       break;
   }
 });
+
+// Fungsi untuk mengisi area pada kanvas
+function isiArea(e) {
+  const rect = kanvas.getBoundingClientRect();
+  const x = Math.floor(e.clientX - rect.left);
+  const y = Math.floor(e.clientY - rect.top);
+  // Cek semua objek poligon (termasuk persegi, segitiga, poligon umum)
+  let found = false;
+  for (const objek of objekList) {
+    if (
+      objek.jenis === "poligon" &&
+      apakahTitikDalamPoligon(x, y, objek.titik)
+    ) {
+      found = true;
+      objek.warnaIsi = warnaIsi;
+      gambarUlangSemuaObjek();
+      break;
+    }
+  }
+  if (!found) {
+    alert("Hanya bisa mengisi di dalam area");
+  }
+}
 
 // Panggil fungsi init saat halaman dimuat
 window.addEventListener("load", init);
