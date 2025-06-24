@@ -16,6 +16,10 @@ let warnaGaris = "#000000";
 let warnaIsi = "#ffffff";
 let mode = "gambar"; // Mode: 'gambar', 'isi', atau 'pilih'
 let isiAreaAktif = false;
+let modeBrush = false;
+let jenisBrush = "pena";
+let ketebalanBrush = 3;
+let jejakBrush = [];
 
 // Fungsi inisialisasi
 function init() {
@@ -115,16 +119,69 @@ function init() {
     });
   }
 
+  // Brush: Event handler menu brush
+  const pilihBrush = document.getElementById("pilihBrush");
+  const ketebalanBrushInput = document.getElementById("ketebalanBrush");
+  const labelKetebalanBrush = document.getElementById("labelKetebalanBrush");
+  const btnAktifkanBrush = document.getElementById("btnAktifkanBrush");
+  const btnNonaktifkanBrush = document.getElementById("btnNonaktifkanBrush");
+
+  if (pilihBrush) {
+    pilihBrush.addEventListener("change", (e) => {
+      jenisBrush = e.target.value;
+    });
+  }
+  if (ketebalanBrushInput && labelKetebalanBrush) {
+    ketebalanBrushInput.addEventListener("input", (e) => {
+      ketebalanBrush = parseInt(e.target.value);
+      labelKetebalanBrush.textContent = ketebalanBrush + " px";
+    });
+  }
+  if (btnAktifkanBrush && btnNonaktifkanBrush) {
+    btnAktifkanBrush.addEventListener("click", () => {
+      modeBrush = true;
+      btnAktifkanBrush.style.display = "none";
+      btnNonaktifkanBrush.style.display = "";
+      mode = "brush";
+      kanvas.style.cursor = "pointer";
+      // Nonaktifkan dropdown bentuk saat brush aktif
+      if (dropdownBentuk) dropdownBentuk.disabled = true;
+    });
+    btnNonaktifkanBrush.addEventListener("click", () => {
+      modeBrush = false;
+      btnAktifkanBrush.style.display = "";
+      btnNonaktifkanBrush.style.display = "none";
+      mode = "gambar";
+      kanvas.style.cursor = "crosshair";
+      // Aktifkan dropdown bentuk saat brush nonaktif
+      if (dropdownBentuk) dropdownBentuk.disabled = false;
+    });
+  }
+
   // Event listener untuk kanvas
   kanvas.addEventListener("mousedown", (e) => {
-    if (mode === "gambar") {
+    if (modeBrush) {
+      mulaiBrush(e);
+    } else if (mode === "gambar") {
       mulaiMenggambar(e);
     } else if (mode === "isi") {
       isiArea(e);
     }
   });
-  kanvas.addEventListener("mousemove", sedangMenggambarObjek);
-  kanvas.addEventListener("mouseup", selesaiMenggambar);
+  kanvas.addEventListener("mousemove", (e) => {
+    if (modeBrush) {
+      gambarBrush(e);
+    } else if (mode === "gambar") {
+      sedangMenggambarObjek(e);
+    }
+  });
+  kanvas.addEventListener("mouseup", (e) => {
+    if (modeBrush) {
+      selesaiBrush(e);
+    } else if (mode === "gambar") {
+      selesaiMenggambar(e);
+    }
+  });
   kanvas.addEventListener("click", pilihObjek);
 
   // Tambahan: Dynamic Dropdown dan Form Transformasi
@@ -675,6 +732,15 @@ function gambarObjek(objek) {
         }
       }
       break;
+
+    case "brush":
+      gambarJejakBrush(
+        objek.jejak,
+        objek.jenisBrush,
+        objek.ketebalanBrush,
+        objek.warnaGaris
+      );
+      break;
   }
 }
 
@@ -874,6 +940,91 @@ function isiArea(e) {
   if (!found) {
     alert("Hanya bisa mengisi di dalam area");
   }
+}
+
+// Fungsi brush/corat-coret
+function mulaiBrush(e) {
+  sedangMenggambar = true;
+  jejakBrush = [];
+  const pos = getPosKanvas(e);
+  jejakBrush.push(pos);
+}
+
+function gambarBrush(e) {
+  if (!sedangMenggambar) return;
+  const pos = getPosKanvas(e);
+  jejakBrush.push(pos);
+  gambarUlangSemuaObjek();
+  gambarJejakBrush(jejakBrush, jenisBrush, ketebalanBrush, warnaGaris);
+}
+
+function selesaiBrush(e) {
+  if (!sedangMenggambar) return;
+  sedangMenggambar = false;
+  if (jejakBrush.length > 1) {
+    objekList.push({
+      jenis: "brush",
+      jejak: [...jejakBrush],
+      jenisBrush,
+      ketebalanBrush,
+      warnaGaris,
+    });
+    objekTerpilih = null;
+    gambarUlangSemuaObjek();
+  }
+  jejakBrush = [];
+}
+
+function gambarJejakBrush(jejak, jenis, ketebalan, warna) {
+  if (jejak.length < 2) return;
+  ctx.save();
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.strokeStyle = warna;
+  ctx.lineWidth = ketebalan;
+  // Simulasi brush
+  switch (jenis) {
+    case "pena":
+      ctx.globalAlpha = 1.0;
+      ctx.shadowColor = warna;
+      ctx.shadowBlur = 0;
+      break;
+    case "pensil":
+      ctx.globalAlpha = 0.7;
+      ctx.shadowColor = warna;
+      ctx.shadowBlur = 0;
+      break;
+    case "krayon":
+      ctx.globalAlpha = 0.4;
+      ctx.shadowColor = warna;
+      ctx.shadowBlur = 6;
+      break;
+    case "spidol":
+      ctx.globalAlpha = 0.8;
+      ctx.shadowColor = warna;
+      ctx.shadowBlur = 2;
+      break;
+    case "cat_air":
+      ctx.globalAlpha = 0.25;
+      ctx.shadowColor = warna;
+      ctx.shadowBlur = 10;
+      break;
+  }
+  ctx.beginPath();
+  ctx.moveTo(jejak[0].x, jejak[0].y);
+  for (let i = 1; i < jejak.length; i++) {
+    ctx.lineTo(jejak[i].x, jejak[i].y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function getPosKanvas(e) {
+  const rect = kanvas.getBoundingClientRect();
+  return {
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top,
+  };
 }
 
 // Panggil fungsi init saat halaman dimuat

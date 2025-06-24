@@ -60,6 +60,28 @@
                 </div>
             </div>
 
+            <!-- Panel Brush/Corat-coret -->
+            <div class="panel">
+                <h2>Corat-coret (Brush)</h2>
+                <div class="input-group">
+                    <label for="pilihBrush">Pilih Brush</label>
+                    <select id="pilihBrush">
+                        <option value="pena">Pena</option>
+                        <option value="pensil">Pensil</option>
+                        <option value="krayon">Krayon</option>
+                        <option value="spidol">Spidol</option>
+                        <option value="cat_air">Cat Air</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="ketebalanBrush">Ketebalan Garis</label>
+                    <input type="range" id="ketebalanBrush" min="1" max="30" value="3">
+                    <span id="labelKetebalanBrush">3 px</span>
+                </div>
+                <button id="btnAktifkanBrush">Aktifkan Corat-coret</button>
+                <button id="btnNonaktifkanBrush" style="display:none;">Nonaktifkan Corat-coret</button>
+            </div>
+
             <!-- Panel Transformasi -->
             <div class="panel" id="panelTransformasi">
                 <h2>Transformasi</h2>
